@@ -36,8 +36,13 @@ def find_faces(img_path):
 
 
 csv_rinkmena = 'veidai.csv'
-images_folder = 'veidukai'
+images_folder = 'veidukai' # pakeiskite šį katalogą į sasvo aplanką
 data = []
+
+if not os.path.exists(images_folder):
+    print(f'Katalogas „{images_folder}“ nerastas. '
+          f'Sukurkite jį ir jame patalpinkite keletą paveiksliukų. '
+          f'Arba nurodykite kitą katalogą')
 
 # files = [ f for f in os.listdir(images_folder) if f.endswith('jpg') or f.endswith('png')]
 # print(files)
@@ -45,7 +50,7 @@ data = []
 #     veidai = find_faces(images_folder + '/' + f)
 #     print(veidai)
 
-if 0: #os.path.exists(csv_rinkmena):
+if os.path.exists(csv_rinkmena):
     df = pd.read_csv(csv_rinkmena)
 else:
     for filename in os.listdir(images_folder):
