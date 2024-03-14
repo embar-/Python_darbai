@@ -34,43 +34,47 @@ def find_faces(img_path):
     return faces
 
 
+def main():
+    csv_rinkmena = 'veidai.csv'
+    images_folder = 'veidukai' # pakeiskite šį katalogą į sasvo aplanką
+    data = []
 
-csv_rinkmena = 'veidai.csv'
-images_folder = 'veidukai' # pakeiskite šį katalogą į sasvo aplanką
-data = []
+    if not os.path.exists(images_folder):
+        print(f'Katalogas „{images_folder}“ nerastas. '
+              f'Sukurkite jį ir jame patalpinkite keletą paveiksliukų. '
+              f'Arba nurodykite kitą katalogą')
+        return
 
-if not os.path.exists(images_folder):
-    print(f'Katalogas „{images_folder}“ nerastas. '
-          f'Sukurkite jį ir jame patalpinkite keletą paveiksliukų. '
-          f'Arba nurodykite kitą katalogą')
+    # files = [ f for f in os.listdir(images_folder) if f.endswith('jpg') or f.endswith('png')]
+    # print(files)
+    # for f in files:
+    #     veidai = find_faces(images_folder + '/' + f)
+    #     print(veidai)
 
-# files = [ f for f in os.listdir(images_folder) if f.endswith('jpg') or f.endswith('png')]
-# print(files)
-# for f in files:
-#     veidai = find_faces(images_folder + '/' + f)
-#     print(veidai)
+    if os.path.exists(csv_rinkmena):
+        df = pd.read_csv(csv_rinkmena)
+    else:
+        for filename in os.listdir(images_folder):
+            if filename.endswith('jpg') or filename.endswith('png'):
+                img_path = os.path.join(images_folder, filename)
+                faces = find_faces(img_path)
+                data.append({'filename': filename, 'faces_count': len(faces)})
+        df = pd.DataFrame(data)
+        df.to_csv(csv_rinkmena)
 
-if os.path.exists(csv_rinkmena):
-    df = pd.read_csv(csv_rinkmena)
-else:
-    for filename in os.listdir(images_folder):
-        if filename.endswith('jpg') or filename.endswith('png'):
-            img_path = os.path.join(images_folder, filename)
-            faces = find_faces(img_path)
-            data.append({'filename': filename, 'faces_count': len(faces)})
-    df = pd.DataFrame(data)
-    df.to_csv(csv_rinkmena)
+    print(df)
+    print()
 
-print(df)
-print()
+    average_faces = df['faces_count'].mean()
+    print(f'Vidutinis veidų skaičius:', average_faces)
 
-average_faces = df['faces_count'].mean()
-print(f'Vidutinis veidų skaičius:', average_faces)
+    max_faces = df.loc[df['faces_count'].idxmax()]
+    print(f"Daugiausia veidų yra paveiksle: {max_faces['filename']}, veidų: {max_faces['faces_count']}")
 
-max_faces = df.loc[df['faces_count'].idxmax()]
-print(f"Daugiausia veidų yra paveiksle: {max_faces['filename']}, veidų: {max_faces['faces_count']}")
+    df['faces_count'].plot(kind='hist', title='Veidų skaičiaus pasiskirstymas', bins=10)
+    plt.xlabel('Veidų skaičius')
+    plt.ylabel('Paveikslų skaičius')
+    plt.show()
 
-df['faces_count'].plot(kind='hist', title='Veidų skaičiaus pasiskirstymas', bins=10)
-plt.xlabel('Veidų skaičius')
-plt.ylabel('Paveikslų skaičius')
-plt.show()
+if __name__ == '__main__':
+    main()
